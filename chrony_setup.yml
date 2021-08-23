@@ -7,4 +7,4 @@
     - name: Install chrony
       yum: name=chrony state=present
     - name: Start chronyd
-      service: name=chronyd state=started
+      service: name=chrony state=started
