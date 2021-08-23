@@ -1,5 +1,5 @@
 ---
-- name: chrony setting
+- name: chrony setup
   hosts: all
   tasks:
     - name: Install epel_release
