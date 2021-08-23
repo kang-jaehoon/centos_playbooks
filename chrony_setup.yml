@@ -1,10 +1,37 @@
 ---
-- name: chrony setup
-  hosts: all
+## Time setting
+- name: KST setting & sync timezone
+  hosts: "{{ hosts }}"
   tasks:
-    - name: Install epel_release
-      yum: name=epel-release state=latest
-    - name: Install chrony
-      yum: name=chrony state=present
-    - name: Start chronyd
-      service: name=chrony state=started
+    - name: KST setting (1/2)
+      copy:
+        src: /etc/localtime
+        dest: /etc/localtime.bak
+    - name: KST setting (2/2)
+      copy:
+        src: /usr/share/zoneinfo/Asia/Seoul
+        dest: /etc/localtime
+    - name: sync timezone (1/2)
+      yum:
+        name:
+         - rdate
+        state: present
+    - name: sync timezone (2/2)
+      command: rdate -s zero.bora.net && clock -w
+      become: true
+## chrony install
+    - name: chrony install
+      yum:
+        name:
+         - chrony
+        state: present
+    - name: chrony config
+      copy:
+        src: /etc/chrony.conf
+        dest: /etc/chrony.conf.bak
+    - name: Insert timezone
+      template:
+        src: ./template/chrony.conf
+        dest: /etc/chrony.conf
+  vars:
+    hosts: "kay"

@@ -1,0 +1,33 @@
+## Time setting
+---
+- name: Time setting
+  hosts: "{{ hosts }}"
+  tasks:
+    - name: Time setting (1/3)
+      command: timedatectl set-timezone UTC
+    - name: Time setting (2/3)
+      yum:
+        update_cache: yes
+    - name: Time setting (3/3)
+      yum:
+       name:
+        - chrony
+       state: present
+
+## swap disable
+- name: swap disable
+  hosts: "{{ hosts }}"
+  tasks:
+    - name: Disable swap for current session
+      command: swapoff -a
+      become: true
+
+    - name: Disable swap permanently, persist reboots
+      replace:
+        path: /etc/fstab
+        regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+        replace: '#\1\2\3swap\4'
+        backup: yes
+
+  vars:
+    hosts: "kay"
