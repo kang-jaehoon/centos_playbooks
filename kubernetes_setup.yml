@@ -128,7 +128,7 @@
 #           - kubelet-1.20.2-00
         state: present
         disable_excludes: kubernetes
-    - command: rpm -qa | grep kube
+    - shell: rpm -qa | grep kube
       register: shell_result
 
     - debug:
