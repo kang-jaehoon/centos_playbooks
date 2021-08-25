@@ -35,7 +35,7 @@
 
 ## chrony start
     - name: chrony start
-      service: name=chronyd state=started
+      service: name=chronyd state=restarted enabled=yes
 
 ## swap disable
     - name: swap disable (1/2)
@@ -142,7 +142,7 @@
 
 ## kubernetes start
     - name: chrony start
-      service: name=kubelet state=started enabled=yes
+      service: name=kubelet state=restarted enabled=yes
 
   vars:
     hosts: "k-test"
