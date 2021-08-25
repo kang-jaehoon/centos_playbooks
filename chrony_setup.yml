@@ -26,12 +26,14 @@
          - chrony
         state: present
     - name: chrony config
-      copy:
-        src: /etc/chrony.conf
-        dest: /etc/chrony.conf.bak
+      command: cp /etc/chrony.conf /etc/chrony.conf.bak
     - name: Insert timezone
       template:
         src: ./template/chrony.conf
         dest: /etc/chrony.conf
+## chrony start
+    - name: chrony start
+      service: name=chronyd state=started
+
   vars:
     hosts: "all"
