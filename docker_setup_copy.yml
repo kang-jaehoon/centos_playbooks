@@ -1,0 +1,59 @@
+---
+## Time setting
+- name: KST setting & sync timezone
+  hosts: "{{ hosts }}"
+  tasks:
+    - name: KST setting (1/2)
+      copy:
+        src: /etc/localtime
+        dest: /etc/localtime.bak
+    - name: KST setting (2/2)
+      copy:
+        src: /usr/share/zoneinfo/Asia/Seoul
+        dest: /etc/localtime
+    - name: sync timezone (1/2)
+      yum:
+        name:
+         - rdate
+        state: present
+    - name: sync timezone (2/2)
+      command: rdate -s zero.bora.net && clock -w
+      become: true
+## chrony install
+    - name: chrony install
+      yum:
+        name:
+         - chrony
+        state: present
+    - name: chrony config
+      command: cp /etc/chrony.conf /etc/chrony.conf.bak
+    - name: Insert timezone
+      template:
+        src: ./template/chrony.conf
+        dest: /etc/chrony.conf
+## chrony start
+    - name: chrony start
+      service: name=chronyd state=started
+
+## swap disable
+    - name: Disable swap for current session
+      command: swapoff -a
+      become: true
+
+    - name: Disable swap permanently, persist reboots
+      replace:
+        path: /etc/fstab
+        regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+        replace: '#\1\2\3swap\4'
+        backup: yes
+
+## repo Package Install
+    - name: repo Package Install
+      apt:
+       name:
+        - apt-transport-https
+        - software-properties-common
+       state: present
+
+  vars:
+    hosts: "all"
