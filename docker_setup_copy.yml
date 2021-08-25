@@ -49,11 +49,28 @@
 
 ## repo Package Install
     - name: repo Package Install
+      yum:
+       name:
+        - yum-utils
+       state: present
+    - name: docker repo key
+      yum_repository:
+        repo: https://download.docker.com/linux/centos/docker-ce.repo
+        state: present
+    - name: docker install
+      yum:
+        update_cache: yes
+    - name: docker install (6/6)
       apt:
        name:
-        - apt-transport-https
-        - software-properties-common
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
        state: present
+    - shell: docker version
+      register: shell_result
 
+    - debug:
+        var: shell_result.stdout_lines
   vars:
     hosts: "all"
