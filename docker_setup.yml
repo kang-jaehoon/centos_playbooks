@@ -49,37 +49,19 @@
 
 ## repo Package Install
     - name: repo Package Install
-      apt:
+      yum:
        name:
-        - apt-transport-https
-        - software-properties-common
+        - yum-utils
        state: present
-
-## docker install
-    - name: docker install (1/6)
-      yum:
-        update_cache: yes
-
-    - name: docker install (2/6)
-      yum: name={{ item }} state=latest update_cache=yes
-      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
-
-    - name: docker install (3/6)
-      yum_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: docker install (4/6)
+    - name: docker repo key
       yum_repository:
-        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        repo: https://download.docker.com/linux/centos/docker-ce.repo
         state: present
-
-    - name: docker install (5/6)
+    - name: docker install
       yum:
         update_cache: yes
-
     - name: docker install (6/6)
-      yum:
+      apt:
        name:
         - docker-ce
         - docker-ce-cli
@@ -90,6 +72,5 @@
 
     - debug:
         var: shell_result.stdout_lines
-
   vars:
     hosts: "all"
