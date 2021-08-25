@@ -104,7 +104,7 @@
         var: shell_result2.stdout_lines
 
 ## kubernetes repo add
-    - name: kubernetes repo add (1/3)
+    - name: kubernetes repo add
       yum_repository:
         name: kubernetes
         description: kubernetes_repo
@@ -114,10 +114,12 @@
         gpgcheck: yes
         gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
         exclude: exclude=kubelet kubeadm kubectl
-    - name: kubernetes repo add (2/3)
+
+## kubernetes install
+    - name: kubernetes install (1/2)
       yum:
         update_cache: yes
-    - name: kubernetes repo add (3/3)
+    - name: kubernetes install (2/2)
       yum:
         name:
           - kubeadm
