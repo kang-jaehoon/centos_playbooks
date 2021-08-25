@@ -14,4 +14,4 @@
         backup: yes
 
   vars:
-    hosts: "kay"
+    hosts: "all"

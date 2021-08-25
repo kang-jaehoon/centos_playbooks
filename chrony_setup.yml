@@ -34,4 +34,4 @@
         src: ./template/chrony.conf
         dest: /etc/chrony.conf
   vars:
-    hosts: "kay"
+    hosts: "all"
