@@ -78,6 +78,10 @@
     - debug:
         var: shell_result.stdout_lines
 
+## docker start
+    - name: chrony start
+      service: name=docker state=started enabled=yes
+
 ## kubernetes install
     - name: iptables kernel option enable (1/2)
       lineinfile:
@@ -138,7 +142,7 @@
 
 ## kubernetes start
     - name: chrony start
-      service: name=kubelet state=started
+      service: name=kubelet state=started enabled=yes
 
   vars:
     hosts: "k-test"

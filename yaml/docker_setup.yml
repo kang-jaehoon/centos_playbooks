@@ -80,7 +80,7 @@
 
 ## docker start
     - name: chrony start
-      service: name=docker state=started
+      service: name=docker state=started enabled=yes
 
   vars:
     hosts: "k-test"

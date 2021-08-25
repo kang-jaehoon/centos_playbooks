@@ -35,7 +35,7 @@
 
 ## chrony start
     - name: chrony start
-      service: name=chronyd state=started
+      service: name=chronyd state=started enabled=yes
 
   vars:
-    hosts: "all"
+    hosts: "k-test"
