@@ -58,17 +58,7 @@
         name: docker_repo
         description: docker_repo
         baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-    - name: docker install
-      yum:
-       name:
-        - docker-ce
-        - docker-ce-cli
-        - containerd.io
-       state: present
-    - shell: docker version
-      register: shell_result
+        state: present
 
-    - debug:
-        var: shell_result.stdout_lines
   vars:
     hosts: "all"
