@@ -1,18 +1,39 @@
-## Time setting
 ---
-- name: Time setting
+## Time setting
+- name: KST setting & sync timezone
   hosts: "{{ hosts }}"
   tasks:
-    - name: Time setting (1/3)
-      command: timedatectl set-timezone UTC
-    - name: Time setting (2/3)
+    - name: KST setting (1/2)
+      copy:
+        src: /etc/localtime
+        dest: /etc/localtime.bak
+    - name: KST setting (2/2)
+      copy:
+        src: /usr/share/zoneinfo/Asia/Seoul
+        dest: /etc/localtime
+    - name: sync timezone (1/2)
       yum:
-        update_cache: yes
-    - name: Time setting (3/3)
+        name:
+         - rdate
+        state: present
+    - name: sync timezone (2/2)
+      command: rdate -s zero.bora.net && clock -w
+      become: true
+## chrony install
+    - name: chrony install
       yum:
-       name:
-        - chrony
-       state: present
+        name:
+         - chrony
+        state: present
+    - name: chrony config
+      command: cp /etc/chrony.conf /etc/chrony.conf.bak
+    - name: Insert timezone
+      template:
+        src: ./template/chrony.conf
+        dest: /etc/chrony.conf
+## chrony start
+    - name: chrony start
+      service: name=chronyd state=started
 
 ## swap disable
 - name: swap disable
