@@ -1,36 +1,38 @@
 ---
-## Time setting
-- name: KST setting & sync timezone
+## Time setting (KST)
+- name: KST setup & time sync
   hosts: "{{ hosts }}"
   tasks:
-    - name: KST setting (1/2)
+    - name: KST setup (1/2)
       copy:
         src: /etc/localtime
         dest: /etc/localtime.bak
-    - name: KST setting (2/2)
+    - name: KST setup (1/2)
       copy:
         src: /usr/share/zoneinfo/Asia/Seoul
         dest: /etc/localtime
-    - name: sync timezone (1/2)
+    - name: time sync (1/2)
       yum:
         name:
          - rdate
         state: present
-    - name: sync timezone (2/2)
+    - name: time sync (2/2)
       command: rdate -s zero.bora.net && clock -w
       become: true
+
 ## chrony install
-    - name: chrony install
+    - name: chrony install (1/3)
       yum:
         name:
          - chrony
         state: present
-    - name: chrony config
+    - name: chrony install (2/3)
       command: cp /etc/chrony.conf /etc/chrony.conf.bak
-    - name: Insert timezone
+    - name: chrony install (3/3)
       template:
         src: ./template/chrony.conf
         dest: /etc/chrony.conf
+
 ## chrony start
     - name: chrony start
       service: name=chronyd state=started

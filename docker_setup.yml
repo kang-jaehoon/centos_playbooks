@@ -1,67 +1,71 @@
 ---
-## Time setting
-- name: KST setting & sync timezone
+## Time setting (KST)
+- name: KST setup & time sync
   hosts: "{{ hosts }}"
   tasks:
-    - name: KST setting (1/2)
+    - name: KST setup (1/2)
       copy:
         src: /etc/localtime
         dest: /etc/localtime.bak
-    - name: KST setting (2/2)
+    - name: KST setup (1/2)
       copy:
         src: /usr/share/zoneinfo/Asia/Seoul
         dest: /etc/localtime
-    - name: sync timezone (1/2)
+    - name: time sync (1/2)
       yum:
         name:
          - rdate
         state: present
-    - name: sync timezone (2/2)
+    - name: time sync (2/2)
       command: rdate -s zero.bora.net && clock -w
       become: true
+
 ## chrony install
-    - name: chrony install
+    - name: chrony install (1/3)
       yum:
         name:
          - chrony
         state: present
-    - name: chrony config
+    - name: chrony install (2/3)
       command: cp /etc/chrony.conf /etc/chrony.conf.bak
-    - name: Insert timezone
+    - name: chrony install (3/3)
       template:
         src: ./template/chrony.conf
         dest: /etc/chrony.conf
+
 ## chrony start
     - name: chrony start
       service: name=chronyd state=started
 
 ## swap disable
-    - name: Disable swap for current session
+    - name: swap disable (1/2)
       command: swapoff -a
       become: true
 
-    - name: Disable swap permanently, persist reboots
+    - name: swap disable (2/2)
       replace:
         path: /etc/fstab
         regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
         replace: '#\1\2\3swap\4'
         backup: yes
 
-## repo Package Install
-    - name: repo Package Install
+## repo add
+    - name: repo add (1/2)
       yum:
        name:
         - yum-utils
        state: present
-    - name: docker repo key
+    - name: repo add (2/2)
       command: |
                yum-config-manager \
                '--add-repo' \
                https://download.docker.com/linux/centos/docker-ce.repo
-    - name: docker install
+
+## docker Install
+    - name: docker install (1/2)
       yum:
         update_cache: yes
-    - name: docker install (6/6)
+    - name: docker install (2/2)
       yum:
        name:
         - docker-ce
@@ -73,5 +77,6 @@
 
     - debug:
         var: shell_result.stdout_lines
+        
   vars:
     hosts: "all"
