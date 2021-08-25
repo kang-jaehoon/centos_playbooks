@@ -26,7 +26,10 @@
          - chrony
         state: present
     - name: chrony config
-      command: cp /etc/chrony.conf /etc/chrony.conf.bak
+      copy:
+        remove_src: /etc/chrony.conf
+        dest: /etc/chrony.conf.bak
+#      command: cp /etc/chrony.conf /etc/chrony.conf.bak
     - name: Insert timezone
       template:
         src: ./template/chrony.conf
