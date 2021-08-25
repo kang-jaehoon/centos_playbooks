@@ -47,52 +47,5 @@
         replace: '#\1\2\3swap\4'
         backup: yes
 
-## repo Package Install
-- name: repo Package Install
-  hosts: all
-  tasks:
-    - name: repo Package Install
-      apt:
-       name:
-        - apt-transport-https
-        - software-properties-common
-       state: present
-
-## docker install
-    - name: docker install (1/6)
-      yum:
-        update_cache: yes
-
-    - name: docker install (2/6)
-      yum: name={{ item }} state=latest update_cache=yes
-      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'gnupg', 'lsb-release']
-
-    - name: docker install (3/6)
-      yum_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: docker install (4/6)
-      yum_repository:
-        repo: deb https://download.docker.com/linux/ubuntu bionic stable
-        state: present
-
-    - name: docker install (5/6)
-      yum:
-        update_cache: yes
-
-    - name: docker install (6/6)
-      yum:
-       name:
-        - docker-ce
-        - docker-ce-cli
-        - containerd.io
-       state: present
-    - shell: docker version
-      register: shell_result
-
-    - debug:
-        var: shell_result.stdout_lines
-
   vars:
     hosts: "all"
