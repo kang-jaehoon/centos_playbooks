@@ -48,9 +48,6 @@
         backup: yes
 
 ## repo Package Install
-- name: repo Package Install
-  hosts: all
-  tasks:
     - name: repo Package Install
       apt:
        name:
