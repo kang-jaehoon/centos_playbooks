@@ -62,7 +62,7 @@
       yum:
         update_cache: yes
     - name: docker install (6/6)
-      apt:
+      yum:
        name:
         - docker-ce
         - docker-ce-cli
