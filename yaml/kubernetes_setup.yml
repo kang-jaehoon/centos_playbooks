@@ -136,5 +136,9 @@
     - debug:
         var: shell_result.stdout_lines
 
+## kubernetes start
+    - name: chrony start
+      service: name=kubelet state=started
+
   vars:
-    hosts: "all"
+    hosts: "k-test"

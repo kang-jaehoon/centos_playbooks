@@ -77,6 +77,10 @@
 
     - debug:
         var: shell_result.stdout_lines
-        
+
+## docker start
+    - name: chrony start
+      service: name=docker state=started
+
   vars:
-    hosts: "all"
+    hosts: "k-test"
