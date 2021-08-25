@@ -60,9 +60,6 @@
         baseurl: https://download.docker.com/linux/centos/docker-ce.repo
     - name: docker install
       yum:
-        update_cache: yes
-    - name: docker install (6/6)
-      yum:
        name:
         - docker-ce
         - docker-ce-cli
