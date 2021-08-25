@@ -55,8 +55,9 @@
        state: present
     - name: docker repo key
       yum_repository:
-        repo: https://download.docker.com/linux/centos/docker-ce.repo
-        state: present
+        name: docker_repo
+        description: docker_repo
+        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
     - name: docker install
       yum:
         update_cache: yes
