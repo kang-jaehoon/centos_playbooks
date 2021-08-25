@@ -68,7 +68,7 @@
         - docker-ce-cli
         - containerd.io
        state: present
-    - shell: docker version
+    - shell: docker -v
       register: shell_result
 
     - debug:
