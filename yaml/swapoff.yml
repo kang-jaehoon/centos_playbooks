@@ -14,4 +14,4 @@
         backup: yes
 
   vars:
-    hosts: "all"
+    hosts: "k-test"

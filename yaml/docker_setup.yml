@@ -35,7 +35,7 @@
 
 ## chrony start
     - name: chrony start
-      service: name=chronyd state=started enabled=yes
+      service: name=chronyd state=running enabled=yes
 
 ## swap disable
     - name: swap disable (1/2)
@@ -80,7 +80,7 @@
 
 ## docker start
     - name: docker start
-      service: name=docker state=restarted enabled=yes
+      service: name=docker state=running enabled=yes
 
   vars:
     hosts: "k-test"
