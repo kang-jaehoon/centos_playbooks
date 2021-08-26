@@ -79,7 +79,7 @@
         var: shell_result.stdout_lines
 
 ## docker start
-    - name: chrony start
+    - name: docker start
       service: name=docker state=started enabled=yes
 
 ## kubernetes install
@@ -141,7 +141,7 @@
         var: shell_result.stdout_lines
 
 ## kubernetes start
-    - name: chrony start
+    - name: kubernetes start
       service: name=kubelet state=restarted enabled=yes
 
   vars:
