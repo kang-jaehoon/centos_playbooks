@@ -16,7 +16,7 @@
     - name: containerd presetup (3/4)
       command: modprobe overlay
       command: modprobe br_netfilter
-    - name: ontainerd presetup (4/4)
+    - name: containerd presetup (4/4)
       lineinfile:
          path: '/etc/sysctl.d/99-kubernetes-cri.conf'
          line: "net.bridge.bridge-nf-call-iptables  = 1\n
