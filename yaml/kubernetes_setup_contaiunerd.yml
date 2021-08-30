@@ -86,7 +86,7 @@
     - shell: containerd config default | sudo tee /etc/containerd/config.toml
 
 ## systemd cgroup start
-     -name: edit systemd cgroup true
+    - name: edit systemd cgroup true
       replace:
         path: /etc/containerd/config.toml
         regexp: "systemd_cgroup = false"
