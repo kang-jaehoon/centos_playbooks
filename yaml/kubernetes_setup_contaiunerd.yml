@@ -85,8 +85,15 @@
           mode: 0755
     - shell: containerd config default | sudo tee /etc/containerd/config.toml
 
-## containerd start
-    - name: containerd start
+## systemd cgroup start
+     -name: edit systemd cgroup true
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: "systemd_cgroup = false"
+        replace: "systemd_cgroup = true"
+
+## systemd containerd start
+    - name: edit systemd cgroup true
       service: name=containerd state=started enabled=yes
 
 ## kubernetes install
