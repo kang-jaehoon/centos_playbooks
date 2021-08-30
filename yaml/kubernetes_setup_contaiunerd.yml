@@ -88,8 +88,6 @@
 ## containerd start
     - name: containerd start
       service: name=containerd state=started enabled=yes
-  vars:
-    hosts: "k-test"
 
 ## kubernetes install
     - name: iptables kernel option enable (1/2)
