@@ -1,0 +1,148 @@
+---
+## Time setting (KST)
+- name: KST setup & time sync
+  hosts: "{{ hosts }}"
+  tasks:
+    - name: KST setup (1/2)
+      copy:
+        src: /etc/localtime
+        dest: /etc/localtime.bak
+    - name: KST setup (1/2)
+      copy:
+        src: /usr/share/zoneinfo/Asia/Seoul
+        dest: /etc/localtime
+    - name: time sync (1/2)
+      yum:
+        name:
+         - rdate
+        state: present
+    - name: time sync (2/2)
+      command: rdate -s zero.bora.net && clock -w
+      become: true
+
+## chrony install
+    - name: chrony install (1/3)
+      yum:
+        name:
+         - chrony
+        state: present
+    - name: chrony install (2/3)
+      command: cp /etc/chrony.conf /etc/chrony.conf.bak
+    - name: chrony install (3/3)
+      template:
+        src: ./template/chrony.conf
+        dest: /etc/chrony.conf
+
+## chrony start
+    - name: chrony start
+      service: name=chronyd state=started enabled=yes
+
+## swap disable
+    - name: swap disable (1/2)
+      command: swapoff -a
+      become: true
+
+    - name: swap disable (2/2)
+      replace:
+        path: /etc/fstab
+        regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+        replace: '#\1\2\3swap\4'
+        backup: yes
+
+## docker repo add
+    - name: repo add (1/2)
+      yum:
+       name:
+        - yum-utils
+       state: present
+    - name: repo add (2/2)
+      command: |
+               yum-config-manager \
+               '--add-repo' \
+               https://download.docker.com/linux/centos/docker-ce.repo
+
+## docker Install
+    - name: docker install (1/2)
+      yum:
+        update_cache: yes
+    - name: docker install (2/2)
+      yum:
+       name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+       state: present
+    - shell: docker -v
+      register: shell_result
+
+    - debug:
+        var: shell_result.stdout_lines
+
+## docker start
+    - name: docker start
+      service: name=docker state=started enabled=yes
+
+## kubernetes install
+    - name: iptables kernel option enable (1/2)
+      lineinfile:
+         path: '/etc/modules-load.d/k8s.conf'
+         line: "br_netfilter"
+         insertbefore: EOF
+         create: yes
+    - name: iptables kernel option enable (2/2)
+      lineinfile:
+         path: '/etc/sysctl.d/k8s.conf'
+         line: "net.bridge.bridge-nf-call-ip6tables = 1\nnet.bridge.bridge-nf-call-iptables = 1"
+         insertbefore: EOF
+         create: yes
+
+    - command: cat /etc/sysctl.d/k8s.conf
+      register: shell_result
+    - debug:
+        var: shell_result.stdout_lines
+
+    - command: sysctl --system
+      register: shell_result2
+
+    - debug:
+        var: shell_result2.stdout_lines
+
+## kubernetes repo add
+    - name: kubernetes repo add
+      yum_repository:
+        name: kubernetes
+        description: kubernetes_repo
+        file: kubernetes_repo
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        exclude: exclude=kubelet kubeadm kubectl
+
+## kubernetes install
+    - name: kubernetes install (1/2)
+      yum:
+        update_cache: yes
+    - name: kubernetes install (2/2)
+      yum:
+        name:
+          - kubeadm
+          - kubectl
+          - kubelet
+#           - kubeadm-1.20.2-00
+#           - kubectl-1.20.2-00
+#           - kubelet-1.20.2-00
+        state: present
+        disable_excludes: kubernetes
+    - shell: rpm -qa | grep kube
+      register: shell_result
+
+    - debug:
+        var: shell_result.stdout_lines
+
+## kubernetes start
+    - name: kubernetes start
+      service: name=kubelet state=started enabled=yes
+
+  vars:
+    hosts: "k-test"
