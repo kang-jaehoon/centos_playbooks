@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k1tomcat
+spec:
+  selector:
+    app: tomcat
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k1tomcat
+  labels:
+    app: tomcat
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tomcat
+  template:
+    metadata:
+      labels:
+        app: tomcat
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                values:
+                - tomcat
+                operator: In
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: tomcat
+        image: qlqjs90/k1tomcat:8.0.20
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/local/tomcat/webapps/
+          name: vol0
+          readOnly: true
+      volumes:
+      - name: vol0
+        nfs:
+          path: /nfstest/k8s/k1tomcat
+          readOnly: true
+          server: 110.45.173.211
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: k1tomcat-gw
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "k1tomcat.net"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: k1tomcat
+spec:
+  hosts:
+  - "k1tomcat.net"
+  gateways:
+  - k1tomcat-gw
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: k1tomcat

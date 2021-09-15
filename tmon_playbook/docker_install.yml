@@ -7,35 +7,10 @@
       copy:
         src: /etc/localtime
         dest: /etc/localtime.bak
-    - name: KST setup (1/2)
+    - name: KST setup (2/2)
       copy:
         src: /usr/share/zoneinfo/Asia/Seoul
         dest: /etc/localtime
-    - name: time sync (1/2)
-      yum:
-        name:
-         - rdate
-        state: present
-    - name: time sync (2/2)
-      command: rdate -s zero.bora.net && clock -w
-      become: true
-
-## chrony install
-    - name: chrony install (1/3)
-      yum:
-        name:
-         - chrony
-        state: present
-    - name: chrony install (2/3)
-      command: cp /etc/chrony.conf /etc/chrony.conf.bak
-    - name: chrony install (3/3)
-      template:
-        src: ./template/chrony.conf
-        dest: /etc/chrony.conf
-
-## chrony start
-    - name: chrony start
-      service: name=chronyd state=started enabled=yes
 
 ## swap disable
     - name: swap disable (1/2)
@@ -68,8 +43,8 @@
     - name: docker install (2/2)
       yum:
        name:
-        - docker-ce
-        - docker-ce-cli
+        - docker-ce{{ DOCKER_Ver }}
+        - docker-ce-cli{{ DOCKER_Ver }}
         - containerd.io
        state: present
     - shell: docker -v
@@ -82,5 +57,16 @@
     - name: docker start
       service: name=docker state=started enabled=yes
 
+# docker cgroup dirver
+    - name: docker cgroup dirver
+      template:
+        src: ./template/daemon.json
+        dest: /etc/docker/daemon.json
+
+## docker start
+    - name: docker restart
+      service: name=docker state=restarted enabled=yes
+
   vars:
-    hosts: "k-test"
+    hosts: "all"
+    DOCKER_Ver: ""

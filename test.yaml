@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k1tomcat
+  labels:
+    app: tomcat
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tomcat
+  template:
+    metadata:
+      labels:
+        app: tomcat
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                values:
+                - tomcat
+                operator: In
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: tomcat
+        image: kjh3047.inf.tmonc.net:5000/k/k1tomcat:8.0.20
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/local/tomcat/webapps/
+          name: vol0
+          readOnly: true
+      volumes:
+      - name: vol0
+        nfs:
+          path: /nfstest/k8s/k1tomcat
+          readOnly: true
+          server: kjh3047-ct1.tmonc.net

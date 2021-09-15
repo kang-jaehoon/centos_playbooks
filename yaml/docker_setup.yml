@@ -78,6 +78,12 @@
     - debug:
         var: shell_result.stdout_lines
 
+# docker cgroup dirver
+    - name: docker cgroup dirver
+      template:
+        src: ./template/daemon.json
+        dest: /etc/docker/daemon.json
+
 ## docker start
     - name: docker start
       service: name=docker state=started enabled=yes

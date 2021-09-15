@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+data:
+  galera.cnf: |-
+    [galera]
+    # Mandatory settings
+kind: ConfigMap
+metadata:
+  labels:
+    app: mariadb
+  name: k1galera-slave
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: k1galera-slave
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  serviceName: stateful-headless
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                values:
+                - mariadb
+                operator: In
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MARIADB_ROOT_PASSWORD
+              name: mariadb-pw
+        image: mariadb:10.2
+        name: mariadb
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: vol0
+        - mountPath: /etc/mysql/mariadb.conf.d
+          name: config
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: k1galera-slave
+        name: config
+  volumeClaimTemplates:
+  - metadata:
+      name: vol0
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "nfs-client"
+      resources:
+        requests:
+          storage: 5Gi

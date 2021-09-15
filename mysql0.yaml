@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+data:
+  MYSQL_ROOT_PASSWORD: RWtmcmxkbmRiIzM=
+kind: Secret
+metadata:
+  name: my-secret-pw
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+  - port: 3306
+    name: mysql
+  selector:
+    app: mysql
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: stateful-headless
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MYSQL_ROOT_PASSWORD
+              name: my-secret-pw
+        image: mysql:5.7.35
+        name: mysql
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: vol0
+  volumeClaimTemplates:
+  - metadata:
+      name: vol0
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "nfs-client"
+      resources:
+        requests:
+          storage: 5Gi
