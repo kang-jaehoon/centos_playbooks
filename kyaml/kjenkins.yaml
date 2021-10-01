@@ -32,7 +32,6 @@ spec:
         nfs:
           path: /nfstest/jk
           server: 110.45.173.211
-      nodeName: k3s-1
 ---
 apiVersion: v1
 kind: Service

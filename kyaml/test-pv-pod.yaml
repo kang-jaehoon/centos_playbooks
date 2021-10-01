@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+          - name: http-port
+            containerPort: 80
+        volumeMounts:
+          - name: nginx
+            mountPath: /usr/share/nginx/html
+      volumes:
+      - name: nginx
+        persistentVolumeClaim:
+          claimName: ceph-block-pv-pod
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-block-pv-pod
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
+  storageClassName: "ceph-block"
